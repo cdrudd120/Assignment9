@@ -9,11 +9,12 @@ public class HashTable<K, V> implements Map<K, V>{
 	private ArrayList<LinkedList<MapEntry<K, V>>> table;
 	private int capacity;
 	private int size;
-	private int lambda;
+	private double lambda;
 	
 	public HashTable() {
 		size = 0;
 		capacity = 10;
+		lambda = 0;
 		table = new ArrayList<LinkedList<MapEntry<K, V>>>();
 		for(int i = 0; i < capacity; i++)
 		   table.add(new LinkedList<MapEntry<K, V>>());
@@ -89,7 +90,7 @@ public class HashTable<K, V> implements Map<K, V>{
 
 	@Override
 	public V put(K key, V value) {
-		if(calculateLoadFactor()>5) {
+		if(lambda>5) {
 			reHash();
 		}
 		int index = Math.abs(key.hashCode()) % table.size();
@@ -106,12 +107,14 @@ public class HashTable<K, V> implements Map<K, V>{
 					oldEntry=newEntry;
 				}
 				size++;
+				calculateLoadFactor();
 				return oldValue;
 			}
 		}
 		else {
 			table.get(index).add(newEntry);
 			size++;
+			calculateLoadFactor();
 		}
 		return null;
 	}
@@ -137,11 +140,12 @@ public class HashTable<K, V> implements Map<K, V>{
 		MapEntry<K, V> currentEntry = new MapEntry<K, V>(null, null);
 		for(int i = 0; i < table.get(index).size(); i++) {
 			currentEntry=table.get(index).get(i);
-			if (currentEntry.getKey().equals(currentEntry.getKey())) {
+			if (currentEntry.getKey().equals(key)) {
 				//once found removes at index i in linked list
 				table.get(index).remove(i);
 			}
 			size--;
+			calculateLoadFactor();
 		}
 	}
 
@@ -150,22 +154,33 @@ public class HashTable<K, V> implements Map<K, V>{
 		return size;
 	}
 	
-	//helper method to calculate lamda
-	private double calculateLoadFactor() {
+	//helper method to calculate lambda
+	private void calculateLoadFactor() {
 		double totalListLength=0;
 		for(int i=0; i<table.size(); i++) {
 			totalListLength+=table.get(i).size();
 		}
-		return totalListLength/table.size();
+		lambda = totalListLength/table.size();
 	}
 	
 	//helper method to rehash
 	private void reHash() {
+		lambda = 0;
 		ArrayList<LinkedList<MapEntry<K, V>>> tempTable = new ArrayList<LinkedList<MapEntry<K, V>>>();
+		MapEntry<K, V> tempEntry = new MapEntry<K, V>(null, null);
 		for(int i = 0; i < table.size()*2; i++) {
 			tempTable.add(new LinkedList<MapEntry<K, V>>());
-			
-		//don't know where to go from here 
+		//going through old hashtable and getting each mapEntry 
+		for(int j= 0; j<table.size(); j++) {
+			for(int k = 0; k<table.get(j).size() ;j++) {
+				tempEntry = table.get(j).get(k);
+				//put each entry into new table
+				int index = Math.abs(tempEntry.getKey().hashCode()) % tempTable.size();
+				tempTable.get(index).add(tempEntry);
+			}
+		}
+		table=tempTable;
+		calculateLoadFactor();
 		}
 	}
 	
