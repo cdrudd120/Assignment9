@@ -31,13 +31,10 @@ public class HashTableTimer {
 		
 		// For each problem size n . . .
 		for (int n = 1000; n <= 10000; n += 1000) {
-
-			// Uses graphInput to build the needed arrays
-			HashTable<StudentBadHash, String> studentUIDTable = new HashTable<StudentBadHash, String>();
-			StudentBadHash newHash;
+			HashTable<StudentGoodHash, String> studentUIDTable = new HashTable<StudentGoodHash, String>();
+			StudentGoodHash newHash;
 			for (int i = 0; i <= n; i++) {
-				newHash = new StudentBadHash(uIDs.get(i), randNames.get(i), 
-						randNames.get(randNames.size() - i - 1));
+				newHash = new StudentGoodHash(uIDs.get(i), randNames.get(i), randNames.get(randNames.size() - i - 1));
 				
 				studentUIDTable.put(newHash, "a");
 			}
@@ -52,16 +49,14 @@ public class HashTableTimer {
 			// Now, run the test
 			startTime = System.nanoTime();
 			for (int j = 0; j < timesToLoop; j++) {
-				StudentBadHash randomStudent = new StudentBadHash(uIDs.get(j), randNames.get(j), 
-						randNames.get(randNames.size() - j - 1));
+				StudentGoodHash randomStudent = new StudentGoodHash(uIDs.get(j), randNames.get(j), randNames.get(randNames.size() - j - 1));
 				studentUIDTable.put(randomStudent, "b");
 			}
 
 			midpointTime = System.nanoTime();
 			// Run a loop to capture the cost of running the "timesToLoop" loop
 			for (int i = 0; i < timesToLoop; i++) { // empty block
-				StudentBadHash randomStudent = new StudentBadHash(uIDs.get(i), randNames.get(i), 
-						randNames.get(randNames.size() - i - 1));
+				StudentGoodHash randomStudent = new StudentGoodHash(uIDs.get(i), randNames.get(i), randNames.get(randNames.size() - i - 1));
 			}
 
 			stopTime = System.nanoTime();
