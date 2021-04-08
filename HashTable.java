@@ -106,9 +106,8 @@ public class HashTable<K, V> implements Map<K, V>{
 				oldEntry=table.get(index).get(i);
 				if (oldEntry.getKey().equals(key)) {
 					oldEntry.setValue(value);
+					return oldValue;
 				}
-				calculateLoadFactor();
-				return oldValue;
 			}
 		}
 		else {
@@ -122,15 +121,12 @@ public class HashTable<K, V> implements Map<K, V>{
 
 	@Override
 	public V remove(K key) {
-		int index = Math.abs(key.hashCode()) % table.size();
-		MapEntry<K, V> currentEntry = new MapEntry<K, V>(null, null);
 		if(containsKey(key) == true) {
 			V oldValue = this.get(key);
 			findAndRemoveLinkedList(key);
 			return oldValue;
 			}
 		else {
-			findAndRemoveLinkedList(key);
 			return null;
 		}
 	}
@@ -144,9 +140,9 @@ public class HashTable<K, V> implements Map<K, V>{
 			if (currentEntry.getKey().equals(key)) {
 				//once found removes at index i in linked list
 				table.get(index).remove(i);
+				size--;
+				calculateLoadFactor();
 			}
-			size--;
-			calculateLoadFactor();
 		}
 	}
 
@@ -166,23 +162,14 @@ public class HashTable<K, V> implements Map<K, V>{
 	
 	//helper method to rehash
 	private void reHash() {
+		capacity = table.size()*2;
+		List<MapEntry<K, V> >entryList = entries();
+		clear();
 		lambda = 0;
-		ArrayList<LinkedList<MapEntry<K, V>>> tempTable = new ArrayList<LinkedList<MapEntry<K, V>>>();
-		MapEntry<K, V> tempEntry = new MapEntry<K, V>(null, null);
-		for(int i = 0; i < table.size()*2; i++) {
-			tempTable.add(new LinkedList<MapEntry<K, V>>());
-		//going through old hashtable and getting each mapEntry 
-		for(int j= 0; j<table.size(); j++) {
-			for(int k = 0; k<table.get(j).size() ;j++) {
-				tempEntry = table.get(j).get(k);
-				//put each entry into new table
-				int index = Math.abs(tempEntry.getKey().hashCode()) % tempTable.size();
-				tempTable.get(index).add(tempEntry);
-			}
+		for(MapEntry<K, V> m: entryList) {
+			put(m.getKey(),m.getValue());
 		}
-		table=tempTable;
 		calculateLoadFactor();
-		}
 	}
 	
 	
