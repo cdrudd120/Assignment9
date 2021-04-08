@@ -104,8 +104,6 @@ public class HashTable<K, V> implements Map<K, V>{
 		int index = Math.abs(key.hashCode()) % table.size();
 		MapEntry<K, V> oldEntry = new MapEntry<K, V>(null, null);
 		//if key already exists in map
-		if(containsKey(key) == true) {
-			System.out.println("hi");
 			V oldValue = this.get(key);
 			//loops through LinkedList
 			for(int i = 0; i < table.get(index).size(); i++) {
@@ -113,20 +111,16 @@ public class HashTable<K, V> implements Map<K, V>{
 				oldEntry=table.get(index).get(i);
 				if (oldEntry.getKey().equals(key)) {
 					oldEntry.setValue(value);
-					System.out.println("in here");
 					return oldValue;
 				}
 				else {
 					collisions++;
 				}
 			}
-		}
-		else {
-			MapEntry<K, V> newEntry = new MapEntry<K, V>(key, value);
-			table.get(index).add(newEntry);
-			size++;
-			calculateLoadFactor();
-		}
+		MapEntry<K, V> newEntry = new MapEntry<K, V>(key, value);
+		table.get(index).add(newEntry);
+		size++;
+		calculateLoadFactor();
 		return null;
 	}
 
