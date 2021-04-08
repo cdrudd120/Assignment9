@@ -10,14 +10,20 @@ public class HashTable<K, V> implements Map<K, V>{
 	private int capacity;
 	private int size;
 	private double lambda;
+	private int collisions;
 	
 	public HashTable() {
+		collisions = 0;
 		size = 0;
 		capacity = 10;
 		lambda = 0;
 		table = new ArrayList<LinkedList<MapEntry<K, V>>>();
 		for(int i = 0; i < capacity; i++)
 		   table.add(new LinkedList<MapEntry<K, V>>());
+	}
+	
+	public int getCollisions() {
+		return collisions;
 	}
 
 	@Override
@@ -99,6 +105,7 @@ public class HashTable<K, V> implements Map<K, V>{
 		MapEntry<K, V> oldEntry = new MapEntry<K, V>(null, null);
 		//if key already exists in map
 		if(containsKey(key) == true) {
+			System.out.println("hi");
 			V oldValue = this.get(key);
 			//loops through LinkedList
 			for(int i = 0; i < table.get(index).size(); i++) {
@@ -106,7 +113,11 @@ public class HashTable<K, V> implements Map<K, V>{
 				oldEntry=table.get(index).get(i);
 				if (oldEntry.getKey().equals(key)) {
 					oldEntry.setValue(value);
+					System.out.println("in here");
 					return oldValue;
+				}
+				else {
+					collisions++;
 				}
 			}
 		}
