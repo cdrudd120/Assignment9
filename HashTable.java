@@ -25,27 +25,31 @@ public class HashTable<K, V> implements Map<K, V>{
 		table = new ArrayList<LinkedList<MapEntry<K, V>>>();
 		for(int i = 0; i < capacity; i++)
 			   table.add(new LinkedList<MapEntry<K, V>>());
+		size = 0;
 	}
 
 	@Override
 	public boolean containsKey(K key) {
+		if(size==0) {
+			return false;
+		}
 		int index = Math.abs(key.hashCode()) % table.size();
 		LinkedList<MapEntry<K, V>> currentList = table.get(index);
-		
-		int counter = 0;
-		MapEntry<K, V> temp = currentList.get(counter);
-		while(temp.getKey() != null) {
+		MapEntry<K, V> temp = new MapEntry<K, V>(null, null);
+		for(int i = 0; i<currentList.size(); i++) {
+			temp = currentList.get(i);
 			if(temp.getKey() == key) {
 				return true;
 			}
-			temp = currentList.get(counter++);
 		}
-		
 		return false;
 	}
 
 	@Override
 	public boolean containsValue(V value) {
+		if(size==0) {
+			return false;
+		}
 		for(int i=0; i<table.size(); i++) {
 			for(int j=0; j<table.get(i).size(); j++) {
 				if(table.get(i).get(j).getValue().equals(value)) {
@@ -70,15 +74,13 @@ public class HashTable<K, V> implements Map<K, V>{
 	@Override
 	public V get(K key) {
 		int index = Math.abs(key.hashCode()) % table.size();
-		LinkedList<MapEntry<K, V>> currentList = table.get(index);
-		
-		int counter = 0;
-		MapEntry<K, V> temp = currentList.get(counter);
-		while(temp.getKey() != null) {
+		LinkedList<MapEntry<K, V>> currentList = table.get(index);		
+		MapEntry<K, V> temp = new MapEntry<K, V>(null, null);
+		for(int i = 0; i<currentList.size(); i++) {
+			temp = currentList.get(i);
 			if(temp.getKey() == key) {
 				return temp.getValue();
 			}
-			temp = currentList.get(counter++);
 		}
 		return null;
 	}
@@ -94,8 +96,7 @@ public class HashTable<K, V> implements Map<K, V>{
 			reHash();
 		}
 		int index = Math.abs(key.hashCode()) % table.size();
-		MapEntry<K, V> newEntry = new MapEntry<K, V>(key, value);
-		MapEntry<K, V> oldEntry = new MapEntry<K, V>(key, value);
+		MapEntry<K, V> oldEntry = new MapEntry<K, V>(null, null);
 		//if key already exists in map
 		if(containsKey(key) == true) {
 			V oldValue = this.get(key);
@@ -103,15 +104,15 @@ public class HashTable<K, V> implements Map<K, V>{
 			for(int i = 0; i < table.get(index).size(); i++) {
 				//changes oldEntry to always be current MapEntry
 				oldEntry=table.get(index).get(i);
-				if (oldEntry.getKey().equals(newEntry.getKey())) {
-					oldEntry=newEntry;
+				if (oldEntry.getKey().equals(key)) {
+					oldEntry.setValue(value);
 				}
-				size++;
 				calculateLoadFactor();
 				return oldValue;
 			}
 		}
 		else {
+			MapEntry<K, V> newEntry = new MapEntry<K, V>(key, value);
 			table.get(index).add(newEntry);
 			size++;
 			calculateLoadFactor();
